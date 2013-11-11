@@ -30,7 +30,7 @@ var (
 	verboseFlag = flag.Bool("gocheck.v", false, "Verbose mode")
 	streamFlag  = flag.Bool("gocheck.vv", false, "Super verbose mode (disables output caching)")
 	benchFlag   = flag.Bool("gocheck.b", false, "Run benchmarks")
-	benchTime   = flag.Duration("gocheck.btime", 1 * time.Second, "approximate run time for each benchmark")
+	benchTime   = flag.Duration("gocheck.btime", 1*time.Second, "approximate run time for each benchmark")
 	listFlag    = flag.Bool("gocheck.list", false, "List the names of all tests that will be run")
 )
 
@@ -39,10 +39,10 @@ var (
 // module.
 func TestingT(testingT *testing.T) {
 	conf := &RunConf{
-		Filter:    *filterFlag,
-		Verbose:   *verboseFlag,
-		Stream:    *streamFlag,
-		Benchmark: *benchFlag,
+		Filter:        *filterFlag,
+		Verbose:       *verboseFlag,
+		Stream:        *streamFlag,
+		Benchmark:     *benchFlag,
 		BenchmarkTime: *benchTime,
 	}
 	if *listFlag {
@@ -54,6 +54,29 @@ func TestingT(testingT *testing.T) {
 		return
 	}
 	result := RunAll(conf)
+	println(result.String())
+	if !result.Passed() {
+		testingT.Fail()
+	}
+}
+
+func TestSuite(testingT *testing.T, suite interface{}) {
+	conf := &RunConf{
+		Filter:        *filterFlag,
+		Verbose:       *verboseFlag,
+		Stream:        *streamFlag,
+		Benchmark:     *benchFlag,
+		BenchmarkTime: *benchTime,
+	}
+	if *listFlag {
+		w := bufio.NewWriter(os.Stdout)
+		for _, name := range ListAll(conf) {
+			fmt.Fprintln(w, name)
+		}
+		w.Flush()
+		return
+	}
+	result := Run(suite, conf)
 	println(result.String())
 	if !result.Passed() {
 		testingT.Fail()
