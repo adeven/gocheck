@@ -60,7 +60,7 @@ func TestingT(testingT *testing.T) {
 	}
 }
 
-func TestSuite(testingT *testing.T, suite interface{}) {
+func TestingSuiteT(suite interface{}, testingT *testing.T) {
 	conf := &RunConf{
 		Filter:        *filterFlag,
 		Verbose:       *verboseFlag,
